@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CATCHa - Are You Human?</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #f8f9fa;
+            --accent: #00a896;
+            --accent-hover: #02c39a;
+            --text: #2d3436;
+            --text-muted: #636e72;
+            --border: #dfe6e9;
+            --success: #00b894;
+            --error: #d63031;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --accent: #00d9ff;
+            --accent-hover: #00f5ff;
+            --text: #edf2f7;
+            --text-muted: #a0aec0;
+            --border: #2d3748;
+            --success: #48bb78;
+            --error: #fc8181;
+            --shadow: rgba(0,0,0,0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px var(--shadow);
+            border: 1px solid var(--border);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .joke-banner {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0, 168, 150, 0.3);
+        }
+
+        .challenge-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--bg-color);
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .challenge-section:hover {
+            box-shadow: 0 5px 20px var(--shadow);
+        }
+
+        .challenge-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .challenge-number {
+            background: var(--accent);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .emoji-cell {
+            aspect-ratio: 1;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--card-bg);
+        }
+
+        .emoji-cell:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+
+        .emoji-cell.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .riddle-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--card-bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .riddle-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(0, 168, 150, 0.15);
+        }
+
+        .slider-container {
+            margin-top: 15px;
+        }
+
+        .slider-track {
+            height: 50px;
+            background: var(--border);
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slider-target {
+            position: absolute;
+            width: 80px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .slider-handle {
+            position: absolute;
+            width: 46px;
+            height: 46px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
+            user-select: none;
+        }
+
+        .slider-handle:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .slider-handle.success {
+            background: var(--success);
+        }
+
+        .number-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .number-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .number-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .number-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .number-btn.clicked {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .mouse-area {
+            height: 150px;
+            border: 2px dashed var(--border);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .mouse-area.tracking {
+            border-color: var(--accent);
+            background: rgba(0, 168, 150, 0.05);
+        }
+
+        .mouse-area.complete {
+            border-color: var(--success);
+            background: rgba(0, 184, 148, 0.1);
+        }
+
+        .mouse-trail {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .time-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .time-btn {
+            padding: 15px 30px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .time-btn.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .time-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .time-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .time-btn.correct {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .time-btn.wrong {
+            background: var(--error);
+            border-color: var(--error);
+            color: white;
+            animation: shake 0.5s ease;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 168, 150, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            font-size: 4rem;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+            border-color: var(--accent);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .status-message.error {
+            display: block;
+            background: rgba(214, 48, 49, 0.1);
+            color: var(--error);
+        }
+
+        .status-message.success {
+            display: block;
+            background: rgba(0, 184, 148, 0.1);
+            color: var(--success);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .word-input-wrapper {
+            margin-top: 15px;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--accent);
+            transform: scale(1.2);
+        }
+
+        .progress-dot.complete {
+            background: var(--success);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">🐱</div>
+        <div class="loading-text" id="loadingText">Initializing human detection...</div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="logo">🐱</div>
+                <h1 class="title">CATCHa</h1>
+                <p class="subtitle">Prove you're not a robot (or a very clever cat)</p>
+            </div>
+
+            <div class="joke-banner" id="jokeBanner">
+                Bots will be tickled aggressively! 🤖
+            </div>
+
+            <div class="progress-indicator" id="progressIndicator"></div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <form id="captchaForm" method="POST" action="catcha.php">
+                <input type="hidden" name="seed" id="seedInput">
+                <input type="hidden" name="timestamp" id="timestampInput">
+                <input type="hidden" name="challenges" id="challengesInput">
+                <input type="hidden" name="answers" id="answersInput">
+
+                <div id="challengesContainer"></div>
+
+                <div class="status-message" id="statusMessage"></div>
+
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    🔒 Complete All Challenges First
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // Configuration
+            const CONFIG = {
+                minChallenges: 2,
+                maxChallenges: 3,
+                loadingMinTime: 1500,
+                mouseTrackTime: 2000
+            };
+
+            // State
+            const state = {
+                seed: null,
+                timestamp: null,
+                selectedChallenges: [],
+                answers: {},
+                completedChallenges: new Set(),
+                isDarkMode: false
+            };
+
+            // Funny messages
+            const JOKES = {
+                banners: [
+                    "Bots will be tickled aggressively! 🤖",
+                    "Warning: This CAPTCHA judges your life choices.",
+                    "Robots hate this one weird trick!",
+                    "Powered by confusion and caffeine ☕",
+                    "100% organic human verification",
+                    "No robots were harmed in making this... yet.",
+                    "Sponsored by the Human Appreciation Society",
+                    "Bot detected? We're telling your mother.",
+                    "May contain traces of actual intelligence required"
+                ],
+                loading: [
+                    "Warming up the hamsters...",
+                    "Calibrating anti-robot lasers...",
+                    "Teaching the CAPTCHA to love...",
+                    "Consulting the Oracle (it's a cat)...",
+                    "Downloading more RAM...",
+                    "Bribing the verification gnomes...",
+                    "Checking if you're a simulation...",
+                    "Summoning the authentication wizards...",
+                    "Polishing the security keys...",
+                    "Feeding the verification hamsters..."
+                ],
+                hints: [
+                    "(Hint: Be human about it)",
+                    "(Hint: Think like you're not made of circuits)",
+                    "(Hint: Robots can't read this... or can they?)",
+                    "(Hint: Your grandma could do this... probably)"
+                ]
+            };
+
+            // Challenge definitions
+            const CHALLENGES = {
+                emoji: {
+                    type: 'emoji',
+                    name: 'Visual Recognition',
+                    questions: [
+                        { target: '🌮', ask: "Click all tacos that are NOT contemplating the meaning of life", decoys: ['🦊', '👑', '🤖', '🌶️', '🎸', '🚀'] },
+                        { target: '🦊', ask: "Select every fox that has definitely paid their taxes", decoys: ['🌮', '👑', '🤖', '🌶️', '🎸', '🚀'] },
+                        { target: '🤖', ask: "Click robots that need a firmware update (all of them)", decoys: ['🦊', '👑', '🌮', '🌶️', '🎸', '🚀'] },
+                        { target: '🚀', ask: "Select rockets going to meetings they could've been emails", decoys: ['🦊', '👑', '🤖', '🌶️', '🎸', '🌮'] },
+                        { target: '🎸', ask: "Click guitars that play wonderwall at parties", decoys: ['🦊', '👑', '🤖', '🌶️', '🌮', '🚀'] }
+                    ]
+                },
+                riddle: {
+                    type: 'riddle',
+                    name: 'Logic Challenge',
+                    questions: [
+                        { q: "What's 2 + 2? (Hint: It rhymes with 'door', unless you're a bot)", a: '4', hint: "It's not complicated, we promise" },
+                        { q: "How many legs does a cat have? (Asking for verification purposes)", a: '4', hint: "Unless it's a mutant cat" },
+                        { q: "What comes after 6 and before 8? (Deep stuff)", a: '7', hint: "Lucky number, some say" },
+                        { q: "If a robot asks you this question, what do you answer? Type 'human'", a: 'human', hint: "You ARE human... right?" },
+                        { q: "Complete: 'I am not a ____' (4 letters, rhymes with 'dot')", a: 'bot', hint: "Think about what you're trying to prove" },
+                        { q: "What's the first letter of 'CAPTCHA'? (This is not a trick)", a: 'c', hint: "Look at the word again" }
+                    ]
+                },
+                slider: {
+                    type: 'slider',
+                    name: 'Mini-Game',
+                    description: "Drag the cat to the cozy spot! 🐱➡️🏠"
+                },
+                numbers: {
+                    type: 'numbers',
+                    name: 'Sequence Challenge',
+                    description: "Click the numbers in order (1, 2, 3, 4, 5). Yes, really."
+                },
+                mouse: {
+                    type: 'mouse',
+                    name: 'Human Randomness',
+                    description: "Move your mouse chaotically in the box for 2 seconds. Be unpredictable!"
+                },
+                timing: {
+                    type: 'timing',
+                    name: 'Patience Test',
+                    description: "Two buttons will appear. Click the SECOND one that shows up. Patience is a virtue!"
+                },
+                word: {
+                    type: 'word',
+                    name: 'Humanity Check',
+                    questions: [
+                        { prompt: "Type a word that feels human, like 'bananaphone'", examples: ['bananaphone', 'pizza', 'coffee', 'nap', 'monday', 'yeet', 'bruh', 'vibes'] },
+                        { prompt: "Type something only a human would say (anything works!)", examples: ['hello', 'tired', 'hungry', 'bored', 'happy', 'why', 'help', 'ok'] }
+                    ]
+                }
+            };
+
+            // Utility functions
+            function seededRandom(seed) {
+                const x = Math.sin(seed) * 10000;
+                return x - Math.floor(x);
+            }
+
+            function shuffleArray(array, seed) {
+                const arr = [...array];
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(seededRandom(seed + i) * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            function generateSeed() {
+                return Math.floor(Math.random() * 1000000);
+            }
+
+            function getRandomItem(array, seed) {
+                return array[Math.floor(seededRandom(seed) * array.length)];
+            }
+
+            // Initialize
+            function init() {
+                state.seed = generateSeed();
+                state.timestamp = Date.now();
+                
+                // Random theme
+                state.isDarkMode = Math.random() > 0.5;
+                applyTheme();
+
+                // Set hidden inputs
+                document.getElementById('seedInput').value = state.seed;
+                document.getElementById('timestampInput').value = state.timestamp;
+
+                // Show loading
+                showLoading();
+            }
+
+            function applyTheme() {
+                document.body.classList.toggle('dark-mode', state.isDarkMode);
+                document.getElementById('themeToggle').textContent = state.isDarkMode ? '☀️' : '🌙';
+            }
+
+            function showLoading() {
+                const overlay = document.getElementById('loadingOverlay');
+                const text = document.getElementById('loadingText');
+                
+                let messageIndex = 0;
+                const messages = shuffleArray(JOKES.loading, state.seed);
+                
+                const interval = setInterval(() => {
+                    text.textContent = messages[messageIndex % messages.length];
+                    messageIndex++;
+                }, 500);
+
+                setTimeout(() => {
+                    clearInterval(interval);
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        setupChallenges();
+                    }, 500);
+                }, CONFIG.loadingMinTime);
+            }
+
+            function setupChallenges() {
+                // Select random challenges
+                const challengeTypes = Object.keys(CHALLENGES);
+                const numChallenges = CONFIG.minChallenges + Math.floor(seededRandom(state.seed) * (CONFIG.maxChallenges - CONFIG.minChallenges + 1));
+                
+                state.selectedChallenges = shuffleArray(challengeTypes, state.seed).slice(0, numChallenges);
+                document.getElementById('challengesInput').value = state.selectedChallenges.join(',');
+
+                // Update joke banner
+                document.getElementById('jokeBanner').textContent = getRandomItem(JOKES.banners, state.seed);
+
+                // Create progress dots
+                const progressIndicator = document.getElementById('progressIndicator');
+                progressIndicator.innerHTML = state.selectedChallenges.map((_, i) => 
+                    `<div class="progress-dot" data-index="${i}"></div>`
+                ).join('');
+
+                // Render challenges
+                const container = document.getElementById('challengesContainer');
+                state.selectedChallenges.forEach((type, index) => {
+                    const section = createChallenge(type, index);
+                    container.appendChild(section);
+                });
+
+                updateProgress();
+            }
+
+            function createChallenge(type, index) {
+                const section = document.createElement('div');
+                section.className = 'challenge-section';
+                section.dataset.type = type;
+                section.dataset.index = index;
+
+                const challenge = CHALLENGES[type];
+                
+                section.innerHTML = `
+                    <div class="challenge-title">
+                        <span class="challenge-number">${index + 1}</span>
+                        ${challenge.name}
+                    </div>
+                `;
+
+                switch (type) {
+                    case 'emoji':
+                        renderEmojiChallenge(section, index);
+                        break;
+                    case 'riddle':
+                        renderRiddleChallenge(section, index);
+                        break;
+                    case 'slider':
+                        renderSliderChallenge(section, index);
+                        break;
+                    case 'numbers':
+                        renderNumbersChallenge(section, index);
+                        break;
+                    case 'mouse':
+                        renderMouseChallenge(section, index);
+                        break;
+                    case 'timing':
+                        renderTimingChallenge(section, index);
+                        break;
+                    case 'word':
+                        renderWordChallenge(section, index);
+                        break;
+                }
+
+                return section;
+            }
+
+            function renderEmojiChallenge(section, index) {
+                const questions = CHALLENGES.emoji.questions;
+                const question = questions[Math.floor(seededRandom(state.seed + index) * questions.length)];
+                
+                // Generate grid with targets and decoys
+                const targetCount = 2 + Math.floor(seededRandom(state.seed + index + 100) * 3); // 2-4 targets
+                const decoyCount = 8 - targetCount;
+                
+                let emojis = [];
+                for (let i = 0; i < targetCount; i++) emojis.push({ emoji: question.target, isTarget: true });
+                
+                const shuffledDecoys = shuffleArray(question.decoys, state.seed + index);
+                for (let i = 0; i < decoyCount; i++) {
+                    emojis.push({ emoji: shuffledDecoys[i % shuffledDecoys.length], isTarget: false });
+                }
+                
+                emojis = shuffleArray(emojis, state.seed + index + 50);
+
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${question.ask}</p>
+                    <div class="emoji-grid">
+                        ${emojis.map((e, i) => `
+                            <div class="emoji-cell" data-index="${i}" data-target="${e.isTarget}">${e.emoji}</div>
+                        `).join('')}
+                    </div>
+                    <p class="hint">${getRandomItem(JOKES.hints, state.seed + index)}</p>
+                `;
+                section.appendChild(content);
+
+                // Store expected answer
+                state.answers[`emoji_${index}`] = {
+                    expected: emojis.map((e, i) => e.isTarget ? i : -1).filter(i => i >= 0),
+                    selected: []
+                };
+
+                // Add click handlers
+                content.querySelectorAll('.emoji-cell').forEach(cell => {
+                    cell.addEventListener('click', () => {
+                        cell.classList.toggle('selected');
+                        const cellIndex = parseInt(cell.dataset.index);
+                        const answer = state.answers[`emoji_${index}`];
+                        
+                        if (cell.classList.contains('selected')) {
+                            answer.selected.push(cellIndex);
+                        } else {
+                            answer.selected = answer.selected.filter(i => i !== cellIndex);
+                        }
+                        
+                        checkEmojiComplete(index);
+                    });
+                });
+            }
+
+            function checkEmojiComplete(index) {
+                const answer = state.answers[`emoji_${index}`];
+                const expectedSet = new Set(answer.expected);
+                const selectedSet = new Set(answer.selected);
+                
+                if (expectedSet.size === selectedSet.size && 
+                    [...expectedSet].every(x => selectedSet.has(x))) {
+                    markComplete(index);
+                } else {
+                    markIncomplete(index);
+                }
+                updateProgress();
+            }
+
+            function renderRiddleChallenge(section, index) {
+                const questions = CHALLENGES.riddle.questions;
+                const question = questions[Math.floor(seededRandom(state.seed + index + 200) * questions.length)];
+                
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${question.q}</p>
+                    <input type="text" class="riddle-input" placeholder="Your answer..." data-answer="${question.a.toLowerCase()}">
+                    <p class="hint">${question.hint}</p>
+                `;
+                section.appendChild(content);
+
+                state.answers[`riddle_${index}`] = { expected: question.a.toLowerCase(), value: '' };
+
+                const input = content.querySelector('.riddle-input');
+                input.addEventListener('input', () => {
+                    state.answers[`riddle_${index}`].value = input.value.toLowerCase().trim();
+                    if (state.answers[`riddle_${index}`].value === state.answers[`riddle_${index}`].expected) {
+                        markComplete(index);
+                    } else {
+                        markIncomplete(index);
+                    }
+                    updateProgress();
+                });
+            }
+
+            function renderSliderChallenge(section, index) {
+                const targetPosition = 60 + Math.floor(seededRandom(state.seed + index + 300) * 30); // 60-90%
+                
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${CHALLENGES.slider.description}</p>
+                    <div class="slider-container">
+                        <div class="slider-track">
+                            <div class="slider-target" style="left: ${targetPosition}%;">DROP HERE</div>
+                            <div class="slider-handle" data-target="${targetPosition}">🐱</div>
+                        </div>
+                    </div>
+                `;
+                section.appendChild(content);
+
+                state.answers[`slider_${index}`] = { expected: targetPosition, complete: false };
+
+                const handle = content.querySelector('.slider-handle');
+                const track = content.querySelector('.slider-track');
+                let isDragging = false;
+
+                const startDrag = (e) => {
+                    isDragging = true;
+                    e.preventDefault();
+                };
+
+                const doDrag = (e) => {
+                    if (!isDragging) return;
+                    
+                    const rect = track.getBoundingClientRect();
+                    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+                    
+                    handle.style.left = `calc(${percent}% - 23px)`;
+                    
+                    // Check if in target zone
+                    const targetPos = parseFloat(handle.dataset.target);
+                    if (Math.abs(percent - targetPos) < 10) {
+                        handle.classList.add('success');
+                        state.answers[`slider_${index}`].complete = true;
+                        markComplete(index);
+                    } else {
+                        handle.classList.remove('success');
+                        state.answers[`slider_${index}`].complete = false;
+                        markIncomplete(index);
+                    }
+                    updateProgress();
+                };
+
+                const endDrag = () => {
+                    isDragging = false;
+                };
+
+                handle.addEventListener('mousedown', startDrag);
+                handle.addEventListener('touchstart', startDrag);
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('touchmove', doDrag);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchend', endDrag);
+            }
+
+            function renderNumbersChallenge(section, index) {
+                const numbers = shuffleArray([1, 2, 3, 4, 5], state.seed + index + 400);
+                
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${CHALLENGES.numbers.description}</p>
+                    <div class="number-buttons">
+                        ${numbers.map(n => `
+                            <button type="button" class="number-btn" data-number="${n}">${n}</button>
+                        `).join('')}
+                    </div>
+                `;
+                section.appendChild(content);
+
+                state.answers[`numbers_${index}`] = { sequence: [], expected: [1, 2, 3, 4, 5] };
+
+                content.querySelectorAll('.number-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const num = parseInt(btn.dataset.number);
+                        const answer = state.answers[`numbers_${index}`];
+                        const nextExpected = answer.expected[answer.sequence.length];
+                        
+                        if (num === nextExpected) {
+                            answer.sequence.push(num);
+                            btn.classList.add('clicked');
+                            btn.disabled = true;
+                            
+                            if (answer.sequence.length === answer.expected.length) {
+                                markComplete(index);
+                            }
+                        } else {
+                            // Reset
+                            answer.sequence = [];
+                            content.querySelectorAll('.number-btn').forEach(b => {
+                                b.classList.remove('clicked');
+                                b.disabled = false;
+                            });
+                            btn.style.animation = 'shake 0.5s ease';
+                            setTimeout(() => btn.style.animation = '', 500);
+                        }
+                        updateProgress();
+                    });
+                });
+            }
+
+            function renderMouseChallenge(section, index) {
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${CHALLENGES.mouse.description}</p>
+                    <div class="mouse-area" data-index="${index}">
+                        <span class="timer-display">2.0s</span>
+                    </div>
+                `;
+                section.appendChild(content);
+
+                state.answers[`mouse_${index}`] = { 
+                    points: [], 
+                    complete: false,
+                    tracking: false,
+                    startTime: null
+                };
+
+                const area = content.querySelector('.mouse-area');
+                const timer = area.querySelector('.timer-display');
+                let animFrame;
+
+                area.addEventListener('mouseenter', () => {
+                    if (state.answers[`mouse_${index}`].complete) return;
+                    
+                    const answer = state.answers[`mouse_${index}`];
+                    answer.tracking = true;
+                    answer.startTime = Date.now();
+                    answer.points = [];
+                    area.classList.add('tracking');
+
+                    const updateTimer = () => {
+                        if (!answer.tracking) return;
+                        
+                        const elapsed = Date.now() - answer.startTime;
+                        const remaining = Math.max(0, (CONFIG.mouseTrackTime - elapsed) / 1000);
+                        timer.textContent = remaining.toFixed(1) + 's';
+
+                        if (elapsed >= CONFIG.mouseTrackTime) {
+                            answer.tracking = false;
+                            
+                            // Check for randomness (variance in movement)
+                            if (answer.points.length > 10) {
+                                const variance = calculateVariance(answer.points);
+                                if (variance > 50) {
+                                    answer.complete = true;
+                                    area.classList.remove('tracking');
+                                    area.classList.add('complete');
+                                    timer.textContent = '✓';
+                                    markComplete(index);
+                                } else {
+                                    timer.textContent = 'Try again!';
+                                    area.classList.remove('tracking');
+                                }
+                            } else {
+                                timer.textContent = 'Move more!';
+                                area.classList.remove('tracking');
+                            }
+                            updateProgress();
+                            return;
+                        }
+                        animFrame = requestAnimationFrame(updateTimer);
+                    };
+                    updateTimer();
+                });
+
+                area.addEventListener('mousemove', (e) => {
+                    const answer = state.answers[`mouse_${index}`];
+                    if (!answer.tracking || answer.complete) return;
+
+                    const rect = area.getBoundingClientRect();
+                    answer.points.push({
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    });
+
+                    // Visual trail
+                    const trail = document.createElement('div');
+                    trail.className = 'mouse-trail';
+                    trail.style.left = (e.clientX - rect.left - 4) + 'px';
+                    trail.style.top = (e.clientY - rect.top - 4) + 'px';
+                    area.appendChild(trail);
+                    setTimeout(() => trail.remove(), 1000);
+                });
+
+                area.addEventListener('mouseleave', () => {
+                    const answer = state.answers[`mouse_${index}`];
+                    if (answer.tracking && !answer.complete) {
+                        answer.tracking = false;
+                        area.classList.remove('tracking');
+                        timer.textContent = '2.0s';
+                        cancelAnimationFrame(animFrame);
+                    }
+                });
+            }
+
+            function calculateVariance(points) {
+                if (points.length < 2) return 0;
+                
+                let totalDistance = 0;
+                let directions = [];
+                
+                for (let i = 1; i < points.length; i++) {
+                    const dx = points[i].x - points[i-1].x;
+                    const dy = points[i].y - points[i-1].y;
+                    totalDistance += Math.sqrt(dx*dx + dy*dy);
+                    directions.push(Math.atan2(dy, dx));
+                }
+
+                // Check direction variance
+                let directionChanges = 0;
+                for (let i = 1; i < directions.length; i++) {
+                    if (Math.abs(directions[i] - directions[i-1]) > 0.3) {
+                        directionChanges++;
+                    }
+                }
+
+                return (totalDistance / points.length) * (directionChanges + 1);
+            }
+
+            function renderTimingChallenge(section, index) {
+                const delay = 1000 + Math.floor(seededRandom(state.seed + index + 500) * 2000); // 1-3 seconds
+                
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${CHALLENGES.timing.description}</p>
+                    <div class="time-buttons">
+                        <button type="button" class="time-btn" data-order="1">Button A</button>
+                        <button type="button" class="time-btn" data-order="2">Button B</button>
+                    </div>
+                    <p class="hint">Wait for it...</p>
+                `;
+                section.appendChild(content);
+
+                state.answers[`timing_${index}`] = { 
+                    correctOrder: 2, 
+                    clicked: null,
+                    buttonsShown: [false, false]
+                };
+
+                const buttons = content.querySelectorAll('.time-btn');
+                
+                // Show first button immediately
+                setTimeout(() => {
+                    buttons[0].classList.add('visible');
+                    state.answers[`timing_${index}`].buttonsShown[0] = true;
+                }, 100);
+
+                // Show second button after delay
+                setTimeout(() => {
+                    buttons[1].classList.add('visible');
+                    state.answers[`timing_${index}`].buttonsShown[1] = true;
+                }, delay);
+
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const order = parseInt(btn.dataset.order);
+                        const answer = state.answers[`timing_${index}`];
+                        
+                        if (answer.clicked !== null) return;
+                        
+                        answer.clicked = order;
+                        
+                        if (order === answer.correctOrder && answer.buttonsShown[1]) {
+                            btn.classList.add('correct');
+                            markComplete(index);
+                        } else {
+                            btn.classList.add('wrong');
+                            // Reset after a moment
+                            setTimeout(() => {
+                                answer.clicked = null;
+                                btn.classList.remove('wrong');
+                            }, 1000);
+                        }
+                        updateProgress();
+                    });
+                });
+            }
+
+            function renderWordChallenge(section, index) {
+                const questions = CHALLENGES.word.questions;
+                const question = questions[Math.floor(seededRandom(state.seed + index + 600) * questions.length)];
+                
+                const content = document.createElement('div');
+                content.innerHTML = `
+                    <p>${question.prompt}</p>
+                    <div class="word-input-wrapper">
+                        <input type="text" class="riddle-input" placeholder="Type something human...">
+                    </div>
+                    <p class="hint">Examples: ${question.examples.slice(0, 4).join(', ')}...</p>
+                `;
+                section.appendChild(content);
+
+                state.answers[`word_${index}`] = { value: '', minLength: 3 };
+
+                const input = content.querySelector('.riddle-input');
+                input.addEventListener('input', () => {
+                    const value = input.value.trim();
+                    state.answers[`word_${index}`].value = value;
+                    
+                    if (value.length >= 3 && /^[a-zA-Z]+$/.test(value)) {
+                        markComplete(index);
+                    } else {
+                        markIncomplete(index);
+                    }
+                    updateProgress();
+                });
+            }
+
+            function markComplete(index) {
+                state.completedChallenges.add(index);
+                const dot = document.querySelector(`.progress-dot[data-index="${index}"]`);
+                if (dot) {
+                    dot.classList.add('complete');
+                }
+            }
+
+            function markIncomplete(index) {
+                state.completedChallenges.delete(index);
+                const dot = document.querySelector(`.progress-dot[data-index="${index}"]`);
+                if (dot) {
+                    dot.classList.remove('complete');
+                }
+            }
+
+            function updateProgress() {
+                const total = state.selectedChallenges.length;
+                const completed = state.completedChallenges.size;
+                const percent = (completed / total) * 100;
+                
+                document.getElementById('progressFill').style.width = percent + '%';
+                
+                const submitBtn = document.getElementById('submitBtn');
+                if (completed === total) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✓ Verify Humanity';
+                } else {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = `🔒 Complete ${total - completed} More Challenge${total - completed > 1 ? 's' : ''}`;
+                }
+
+                // Update hidden answers field
+                document.getElementById('answersInput').value = JSON.stringify(collectAnswers());
+            }
+
+            function collectAnswers() {
+                const answers = {};
+                
+                state.selectedChallenges.forEach((type, index) => {
+                    const key = `${type}_${index}`;
+                    const answer = state.answers[key];
+                    
+                    if (!answer) return;
+
+                    switch (type) {
+                        case 'emoji':
+                            answers[key] = { selected: answer.selected.sort((a,b) => a-b) };
+                            break;
+                        case 'riddle':
+                            answers[key] = { value: answer.value };
+                            break;
+                        case 'slider':
+                            answers[key] = { complete: answer.complete };
+                            break;
+                        case 'numbers':
+                            answers[key] = { sequence: answer.sequence };
+                            break;
+                        case 'mouse':
+                            answers[key] = { complete: answer.complete, pointCount: answer.points.length };
+                            break;
+                        case 'timing':
+                            answers[key] = { clicked: answer.clicked };
+                            break;
+                        case 'word':
+                            answers[key] = { value: answer.value };
+                            break;
+                    }
+                });
+
+                return answers;
+            }
+
+            // Form submission
+            document.getElementById('captchaForm').addEventListener('submit', (e) => {
+                if (state.completedChallenges.size < state.selectedChallenges.length) {
+                    e.preventDefault();
+                    showStatus('Please complete all challenges first!', 'error');
+                    return;
+                }
+                
+                // Update final answers
+                document.getElementById('answersInput').value = JSON.stringify(collectAnswers());
+            });
+
+            function showStatus(message, type) {
+                const status = document.getElementById('statusMessage');
+                status.textContent = message;
+                status.className = 'status-message ' + type;
+            }
+
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                state.isDarkMode = !state.isDarkMode;
+                applyTheme();
+            });
+
+            // Start
+            init();
+        })();
+    </script>
+</body>
+</html>
