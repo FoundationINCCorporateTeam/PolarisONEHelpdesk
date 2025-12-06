@@ -65,8 +65,9 @@ $ERROR_MESSAGES = [
 ];
 
 // Seeded random function (must match JavaScript implementation)
-function seededRandom(&$seed) {
-    $x = sin($seed++) * 10000;
+// Note: This is a pure function that doesn't need to modify seed for our use case
+function seededRandom($seed) {
+    $x = sin($seed) * 10000;
     return $x - floor($x);
 }
 
@@ -110,12 +111,20 @@ $RIDDLE_QUESTIONS = [
 ];
 
 // Store used nonces (in production, use Redis or database)
-$nonce_file = sys_get_temp_dir() . '/catcha_nonces.json';
+// Using a dedicated subdirectory with restricted permissions for security
+$nonce_dir = sys_get_temp_dir() . '/catcha_private';
+if (!is_dir($nonce_dir)) {
+    mkdir($nonce_dir, 0700, true);
+}
+$nonce_file = $nonce_dir . '/nonces.json';
 
 function getNonces() {
     global $nonce_file;
     if (file_exists($nonce_file)) {
         $data = json_decode(file_get_contents($nonce_file), true);
+        if (!is_array($data)) {
+            return [];
+        }
         // Clean old nonces (older than 10 minutes)
         $cutoff = time() - 600;
         $data = array_filter($data, function($timestamp) use ($cutoff) {
